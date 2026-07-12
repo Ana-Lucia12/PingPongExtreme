@@ -55,4 +55,14 @@ public class GestorBolas {
     public int cantidadBolasActivas() {
         return bolas.size();
     }
+    
+    public void eliminarBolasInactivas() {
+        
+        for (Bola bola : bolas) {
+            
+            if (!bola.isActiva()) {
+                bolas.remove(bola);
+            }
+        }
+    }
 }

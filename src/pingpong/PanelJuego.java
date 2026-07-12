@@ -30,6 +30,15 @@ public class PanelJuego extends javax.swing.JPanel {
 
     private Temporizador temporizador;
     
+    private GestorBolas gestorBolas;
+    private ControlPausa controlPausa;
+    private PanelBolas panelBolas;
+    private javax.swing.Timer temporizadorDibujo;
+    private GeneradorBolas generadorBolas;
+    private Thread hiloGenerador;
+    
+    private boolean partidaIniciada;
+    
     private static final int X_Izquierda = 20;
     private static final int X_Derecha = 640;
     private static final int Y_Inicial = 120;
@@ -42,7 +51,34 @@ public class PanelJuego extends javax.swing.JPanel {
     public PanelJuego() {
         initComponents();
         
+        
+        partidaIniciada = false;
+        
         PanelMesa.setLayout(null); 
+        
+        gestorBolas = new GestorBolas();
+        controlPausa = new ControlPausa();
+
+        panelBolas = new PanelBolas(gestorBolas);
+        panelBolas.setBounds(0, 0, 670, 330);
+        panelBolas.setVisible(true);
+
+        PanelMesa.add(panelBolas);
+        PanelMesa.setComponentZOrder(panelBolas, 0);
+        
+        PanelMesa.revalidate();
+        PanelMesa.repaint();
+        
+        temporizadorDibujo = new javax.swing.Timer(20, e -> {
+            gestorBolas.eliminarBolasInactivas();
+            panelBolas.repaint();
+            
+            if (temporizador != null) {
+                actualizarLabels();
+            }
+        });
+        
+        temporizadorDibujo.start();
 
         jLabelPaletaIzquierda.setBounds(X_Izquierda, Y_Inicial, 15, 80);
         jLabelPaletaDerecha.setBounds(X_Derecha, Y_Inicial, 15, 80);
@@ -142,6 +178,53 @@ public class PanelJuego extends javax.swing.JPanel {
         
         lblRonda.setText("Ronda: " + gestor.getRondaActual() + "/3");
     }
+    
+    // Configurar la dificultad
+    private ConfiguracionDificultad obtenerDificultadSeleccionada() {
+        String seleccion = jComboBox1.getSelectedItem().toString();
+        
+        switch (seleccion) {
+            
+            case "Fácil":
+                return ConfiguracionDificultad.FACIL;
+                
+            case "Difícil":
+                return ConfiguracionDificultad.DIFICIL;
+                
+            case "Extremo":
+                return ConfiguracionDificultad.EXTREMO;    
+                
+            case "Normal":
+            default:
+                return ConfiguracionDificultad.NORMAL;                  
+        }
+    }
+    
+    // iniciar el generador
+    private void iniciarGeneradorBolas() {
+        
+        if (hiloGenerador != null && hiloGenerador.isAlive()) {
+            return;
+        }
+        
+        
+        ConfiguracionDificultad dificultad = obtenerDificultadSeleccionada();
+        
+        generadorBolas = new GeneradorBolas(
+                gestorBolas,
+                dificultad,
+                izquierda,
+                derecha,
+                jugador1,
+                jugador2,
+                controlPausa
+        );
+        
+        hiloGenerador = new Thread(generadorBolas);
+        hiloGenerador.start();
+        
+        jComboBox1.setEnabled(false);
+    }
 
 
     /**
@@ -205,21 +288,21 @@ public class PanelJuego extends javax.swing.JPanel {
         lblDificultad.setFont(new java.awt.Font("Century Gothic", 0, 14)); // NOI18N
         lblDificultad.setForeground(new java.awt.Color(0, 0, 0));
         lblDificultad.setText("Dificultad:");
-        add(lblDificultad, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 420, -1, 20));
+        add(lblDificultad, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 420, -1, 20));
 
         jComboBox1.setBackground(new java.awt.Color(0, 0, 0));
         jComboBox1.setFont(new java.awt.Font("Century Gothic", 0, 12)); // NOI18N
         jComboBox1.setForeground(new java.awt.Color(255, 255, 255));
         jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Fácil", "Normal", "Difícil", "Extremo" }));
         jComboBox1.addActionListener(this::jComboBox1ActionPerformed);
-        add(jComboBox1, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 440, 140, 30));
+        add(jComboBox1, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 440, 140, 30));
 
         btnPausar.setBackground(new java.awt.Color(0, 0, 0));
         btnPausar.setFont(new java.awt.Font("Century Gothic", 0, 14)); // NOI18N
         btnPausar.setForeground(new java.awt.Color(255, 255, 255));
         btnPausar.setText("Pausar");
         btnPausar.addActionListener(this::btnPausarActionPerformed);
-        add(btnPausar, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 440, 100, 30));
+        add(btnPausar, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 440, 130, 30));
 
         btnReiniciar.setBackground(new java.awt.Color(0, 0, 0));
         btnReiniciar.setFont(new java.awt.Font("Century Gothic", 0, 14)); // NOI18N
@@ -233,7 +316,7 @@ public class PanelJuego extends javax.swing.JPanel {
         btnIniciar2.setForeground(new java.awt.Color(255, 255, 255));
         btnIniciar2.setText("Iniciar");
         btnIniciar2.addActionListener(this::btnIniciar2ActionPerformed);
-        add(btnIniciar2, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 440, 110, 30));
+        add(btnIniciar2, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 440, 110, 30));
 
         lblTiempo.setBackground(new java.awt.Color(0, 0, 0));
         lblTiempo.setFont(new java.awt.Font("Century Gothic", 1, 14)); // NOI18N
@@ -269,16 +352,35 @@ public class PanelJuego extends javax.swing.JPanel {
     }//GEN-LAST:event_jComboBox1ActionPerformed
 
     private void btnIniciar2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIniciar2ActionPerformed
+       
         temporizador.iniciar();
-        PanelMesa.requestFocusInWindow();
- 
+        controlPausa.reanudar();
+        iniciarGeneradorBolas();
+        
+        partidaIniciada = true;
+        
+        btnIniciar2.setEnabled(false);       
+        PanelMesa.requestFocusInWindow(); 
     }//GEN-LAST:event_btnIniciar2ActionPerformed
 
     private void btnPausarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPausarActionPerformed
+        
+        if (!partidaIniciada) {
+            return;
+        }
+        
         if(temporizador.estaActivo()) {
+            
             temporizador.pausar();
+            controlPausa.pausar();
+            
+            btnPausar.setText("Reanudar");
+            
         } else {
             temporizador.iniciar();
+            controlPausa.reanudar();
+            
+            btnPausar.setText("Pausar");
             PanelMesa.requestFocusInWindow();
         }
     }//GEN-LAST:event_btnPausarActionPerformed
