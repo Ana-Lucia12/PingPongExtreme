@@ -386,6 +386,19 @@ public class PanelJuego extends javax.swing.JPanel {
     }//GEN-LAST:event_btnPausarActionPerformed
 
     private void btnReiniciarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReiniciarActionPerformed
+        
+        if (generadorBolas != null) {
+            generadorBolas.detener();
+        }
+        
+        generadorBolas = null;
+        hiloGenerador = null;
+        
+        gestorBolas.detenerTodas();
+        panelBolas.repaint();
+        
+        controlPausa.reanudar();
+               
         gestor.reiniciarPartida();
         temporizador.reiniciar();
         
@@ -394,7 +407,14 @@ public class PanelJuego extends javax.swing.JPanel {
 
         jLabelPaletaIzquierda.setLocation(X_Izquierda, izquierda.getY());
         jLabelPaletaDerecha.setLocation(X_Derecha, derecha.getY());
-       
+        
+        partidaIniciada = false;
+        
+        btnIniciar2.setEnabled(true);
+        btnPausar.setText("Pausar");
+        
+        jComboBox1.setEnabled(true);
+        
         actualizarLabels();
         PanelMesa.requestFocusInWindow();
     }//GEN-LAST:event_btnReiniciarActionPerformed

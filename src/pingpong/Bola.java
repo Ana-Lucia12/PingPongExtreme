@@ -160,10 +160,17 @@ public class Bola implements Runnable {
         Rectangle limitesIzquierda = obtenerLimitesPaleta(paletaIzquierda);
         Rectangle limitesDerecha = obtenerLimitesPaleta(paletaDerecha);
         
+        // choque con la paleta izquierda
+        
         if (limitesBola.intersects(limitesIzquierda) && velocidadX < 0) {
             
             if(tipo == TipoBola.FANTASMA && fantasmaDisponible) {
+                
                 fantasmaDisponible = false;
+                
+                // coloca la bola al tro lado de la paleta izquierda
+                x = paletaIzquierda.getX() - diametro - 1;
+                
             } else {
                 
                 if (tipo == TipoBola.CONGELANTE) {
@@ -171,14 +178,17 @@ public class Bola implements Runnable {
                 }
                 
                 velocidadX = -velocidadX;
-                x = paletaIzquierda.getX() + paletaIzquierda.getAncho();
-            }            
+                x = paletaIzquierda.getX() + paletaIzquierda.getAncho();                        
+            }
         }
         
         if (limitesBola.intersects(limitesDerecha) && velocidadX > 0) {
             
             if(tipo == TipoBola.FANTASMA && fantasmaDisponible) {
                 fantasmaDisponible = false;
+                
+                // coloca la bola al otro lado de la paleta derecha
+                x = paletaDerecha.getX() + paletaDerecha.getAncho() + 1;
             } else {
                 
                 if (tipo == TipoBola.CONGELANTE) {
@@ -203,7 +213,7 @@ public class Bola implements Runnable {
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             } finally {
-                paleta.reducirVelocidad();
+                paleta.restaurarVelocidad();
             }
         });
         efectoCongelante.start();

@@ -13,7 +13,7 @@ public class Paleta {
     // Variable
     private int x, y;
     private int velocidad;
-    private static final int VELOCIDAD_NORMAL = 5;
+    private static final int VELOCIDAD_NORMAL = 7;
     private static final int VELOCIDAD_REDUCIDA = 2;
     private static final int ancho = 15, alto = 80;
     
@@ -68,7 +68,7 @@ public class Paleta {
         return alto;
     }
 
-    public int getVelocidad() {
+    public synchronized int getVelocidad() {
         return velocidad;
     }
 

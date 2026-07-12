@@ -15,6 +15,7 @@ public class GeneradorBolas implements Runnable {
     private final Jugador jugador1;
     private final Jugador jugador2;
     private final ControlPausa controlPausa;
+   
 
     private final Random aleatorio;
 
@@ -118,6 +119,10 @@ public class GeneradorBolas implements Runnable {
                 activo = false;
             }
         }
+    }
+    
+    public void detener() {
+        activo = false;
     }
     
 }
