@@ -191,6 +191,7 @@ public class Bola implements Runnable {
         }
     }
     
+    // efecto de la bola congelante
     private void congelarPaleta(Paleta paleta) {
         
         paleta.reducirVelocidad();
@@ -208,7 +209,7 @@ public class Bola implements Runnable {
         efectoCongelante.start();
     }
     
-    // puntaj de las bolas
+    // puntaje de las bolas
     private void aplicarPuntaje(
             Jugador jugadorQueAnota,
             Jugador jugadorQueFalla) {
