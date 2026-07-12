@@ -4,10 +4,8 @@
  */
 package pingpong;
 
-/**
- *
- * @author Usuario
- */
+import java.awt.Rectangle;
+
 public class Bola implements Runnable {
     
     private int x;
@@ -94,6 +92,7 @@ public class Bola implements Runnable {
            
            mover();
            verificarReboteVertical(330);
+           verificarChoquePaletas();
            
            try {
                Thread.sleep(20);
@@ -128,7 +127,43 @@ public class Bola implements Runnable {
         return activa;
     }
     
+    // Limites de la bola
     
+    private Rectangle obtenerLimitesBola() {
+        return new Rectangle (x, y, diametro, diametro);
+    }
+    
+    // limites de paletas
+    
+    private Rectangle obtenerLimitesPaleta(Paleta paleta) {
+        return new Rectangle(
+                paleta.getX(),
+                paleta.getY(),
+                paleta.getAncho(),
+                paleta.getAlto()
+        );
+        
+    }
+    
+    // verificar si choco con una paleta
+    
+    private void verificarChoquePaletas() {
+        
+        Rectangle limitesBola = obtenerLimitesBola();
+        
+        Rectangle limitesIzquierda = obtenerLimitesPaleta(paletaIzquierda);
+        Rectangle limitesDerecha = obtenerLimitesPaleta(paletaDerecha);
+        
+        if (limitesBola.intersects(limitesIzquierda) && velocidadX < 0) {
+            
+            velocidadX = -velocidadX;
+            x = paletaIzquierda.getX() + paletaIzquierda.getAncho();
+        }
+        
+        if (limitesBola.intersects(limitesDerecha) && velocidadX > 0) {
+            velocidadX = -velocidadX;
+            x = paletaDerecha.getX() - diametro;
+        }
+    }
+
 }
-
-
