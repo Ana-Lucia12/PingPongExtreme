@@ -103,11 +103,29 @@ public class PanelJuego extends javax.swing.JPanel {
             }
 
             if ("FIN".equals(e.getActionCommand())) {
+                
+                detenerMotorBolas();
+                
                 gestor.verificarGanadorRonda();
+                
                 if (gestor.quedanMasRondas()) {
+                    
                     gestor.iniciarNuevaRonda();
+                    reiniciarPaletas();
+                    
+                    controlPausa.reanudar();
+                    
                     temporizador.reiniciarYIniciar();
+                    iniciarGeneradorBolas();
+                    
                 } else {
+                    partidaIniciada = false;
+                    
+                    btnIniciar2.setEnabled(false);
+                    btnPausar.setEnabled(false);
+                    jComboBox1.setEnabled(true);
+                    
+                    reiniciarPaletas();
                     mostrarGanador();
                 }
                 actualizarLabels();
@@ -224,6 +242,30 @@ public class PanelJuego extends javax.swing.JPanel {
         hiloGenerador.start();
         
         jComboBox1.setEnabled(false);
+    }
+    
+    // detener bolas y generador
+    private void detenerMotorBolas() {
+        
+        if (generadorBolas != null) {
+            generadorBolas.detener();
+        }
+        
+        generadorBolas = null;
+        hiloGenerador = null;
+        
+        gestorBolas.detenerTodas();
+        panelBolas.repaint();
+    }
+    
+    // Reiniciar las paletas
+    private void reiniciarPaletas() {
+        
+        izquierda.reiniciar(Y_Inicial);
+        derecha.reiniciar(Y_Inicial);
+        
+        jLabelPaletaIzquierda.setLocation(X_Izquierda, izquierda.getY());
+        jLabelPaletaDerecha.setLocation(X_Derecha, derecha.getY());
     }
 
 
@@ -387,34 +429,23 @@ public class PanelJuego extends javax.swing.JPanel {
 
     private void btnReiniciarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReiniciarActionPerformed
         
-        if (generadorBolas != null) {
-            generadorBolas.detener();
-        }
-        
-        generadorBolas = null;
-        hiloGenerador = null;
-        
-        gestorBolas.detenerTodas();
-        panelBolas.repaint();
-        
+        detenerMotorBolas();
+
         controlPausa.reanudar();
-               
+
         gestor.reiniciarPartida();
         temporizador.reiniciar();
-        
-        izquierda.reiniciar(Y_Inicial);
-        derecha.reiniciar(Y_Inicial);
 
-        jLabelPaletaIzquierda.setLocation(X_Izquierda, izquierda.getY());
-        jLabelPaletaDerecha.setLocation(X_Derecha, derecha.getY());
-        
+        reiniciarPaletas();
+
         partidaIniciada = false;
-        
+
         btnIniciar2.setEnabled(true);
+        btnPausar.setEnabled(true);
         btnPausar.setText("Pausar");
-        
+
         jComboBox1.setEnabled(true);
-        
+
         actualizarLabels();
         PanelMesa.requestFocusInWindow();
     }//GEN-LAST:event_btnReiniciarActionPerformed
