@@ -1,6 +1,9 @@
+package pingpong;
+
 import java.awt.event.KeyEvent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+
 
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license

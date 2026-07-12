@@ -1,3 +1,4 @@
+package pingpong;
 
 import javax.swing.Timer;
 import java.awt.event.ActionEvent;
