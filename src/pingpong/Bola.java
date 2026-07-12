@@ -42,11 +42,16 @@ public class Bola implements Runnable {
             ControlPausa controlPausa) {
         
         this.x = x;
-        this.y = y;
+        this.y = y;        
         this.diametro = 18;
         
         this.velocidadX = velocidad;
         this.velocidadY = velocidad;
+        
+        if (tipo == TipoBola.RAPIDA) {
+            this.velocidadX *= 2;
+            this.velocidadY *= 2;
+        }
         
         this.tipo = tipo;
               
@@ -157,14 +162,50 @@ public class Bola implements Runnable {
         
         if (limitesBola.intersects(limitesIzquierda) && velocidadX < 0) {
             
-            velocidadX = -velocidadX;
-            x = paletaIzquierda.getX() + paletaIzquierda.getAncho();
+            if(tipo == TipoBola.FANTASMA && fantasmaDisponible) {
+                fantasmaDisponible = false;
+            } else {
+                
+                if (tipo == TipoBola.CONGELANTE) {
+                    congelarPaleta(paletaDerecha);
+                }
+                
+                velocidadX = -velocidadX;
+                x = paletaIzquierda.getX() + paletaIzquierda.getAncho();
+            }            
         }
         
         if (limitesBola.intersects(limitesDerecha) && velocidadX > 0) {
-            velocidadX = -velocidadX;
-            x = paletaDerecha.getX() - diametro;
+            
+            if(tipo == TipoBola.FANTASMA && fantasmaDisponible) {
+                fantasmaDisponible = false;
+            } else {
+                
+                if (tipo == TipoBola.CONGELANTE) {
+                    congelarPaleta(paletaIzquierda);
+                }
+                
+                velocidadX = -velocidadX;
+                x = paletaDerecha.getX() - diametro;
+            }           
         }
+    }
+    
+    private void congelarPaleta(Paleta paleta) {
+        
+        paleta.reducirVelocidad();
+        
+        Thread efectoCongelante = new Thread(() -> {
+            
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            } finally {
+                paleta.reducirVelocidad();
+            }
+        });
+        efectoCongelante.start();
     }
     
     // puntaj de las bolas

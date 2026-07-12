@@ -13,6 +13,8 @@ public class Paleta {
     // Variable
     private int x, y;
     private int velocidad;
+    private static final int VELOCIDAD_NORMAL = 5;
+    private static final int VELOCIDAD_REDUCIDA = 2;
     private static final int ancho = 15, alto = 80;
     
     //Constructor
@@ -20,7 +22,7 @@ public class Paleta {
     public Paleta(int x, int y) {
         this.x = x;
         this.y = y;
-        this.velocidad = 5;
+        this.velocidad = VELOCIDAD_NORMAL;
     }
 
     //Movilidad
@@ -38,6 +40,15 @@ public class Paleta {
     
     public void reiniciar(int nuevaY) {
         y = nuevaY;
+        velocidad = VELOCIDAD_NORMAL;
+    }
+    
+    public synchronized void reducirVelocidad() {
+        velocidad = VELOCIDAD_REDUCIDA;
+    }
+    
+    public synchronized void restaurarVelocidad() {
+        velocidad = VELOCIDAD_NORMAL;
     }
     
     //Getters
