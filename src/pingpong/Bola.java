@@ -93,6 +93,7 @@ public class Bola implements Runnable {
            mover();
            verificarReboteVertical(330);
            verificarChoquePaletas();
+           verificarSalidaLateral(670);
            
            try {
                Thread.sleep(20);
@@ -165,5 +166,48 @@ public class Bola implements Runnable {
             x = paletaDerecha.getX() - diametro;
         }
     }
+    
+    // puntaj de las bolas
+    private void aplicarPuntaje(
+            Jugador jugadorQueAnota,
+            Jugador jugadorQueFalla) {
+        
+        switch (tipo) {
+            
+            case NORMAL:
+                jugadorQueAnota.sumarPuntos(1);
+                break;
+                
+            case NEGATIVA:
+                jugadorQueFalla.sumarPuntos(-2);
+                break;
+                
+            case BONUS:
+                jugadorQueAnota.sumarPuntos(2);
+                break;
+                
+            case RAPIDA:
+            case FANTASMA:
+            case CONGELANTE:
+                jugadorQueAnota.sumarPuntos(1);
+                break;
+        }
+    }
+    
+    // salida por los laterales
+    private void verificarSalidaLateral(int anchoPanel) {
+        
+        // sale por el lado izquierdo
+        if (x + diametro < 0) {
+            aplicarPuntaje(jugador2, jugador1);
+            activa = false;
+        }
+        // sale por la derecha
+        if (x > anchoPanel) {
+            aplicarPuntaje (jugador1, jugador2);
+            activa = false;
+        }
+    }
+    
 
 }

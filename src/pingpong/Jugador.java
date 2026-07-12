@@ -31,7 +31,7 @@ public class Jugador {
         this.nombre = nombre;
     }
 
-    public int getPuntaje() {
+    public synchronized int getPuntaje() {
         return puntaje;
     }
 
@@ -49,8 +49,8 @@ public class Jugador {
     
     
     //Métodos 
-    public void sumarPuntos(int puntos) {
-        this.puntaje += puntos;
+    public synchronized void sumarPuntos(int puntos) {
+        puntaje = Math.max(0, puntaje + puntos);
     }
 
     public void ganarRonda() {
